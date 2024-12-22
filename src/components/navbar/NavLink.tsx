@@ -12,6 +12,7 @@ type Props = {
 
 export default function NavLink({ href, label }: Props) {
   const pathname = usePathname();
+  console.log("🚀 ~ NavLink ~ pathname:", pathname);
   return (
     <NavbarItem isActive={pathname === href} as={Link} href={href}>
       <span className="hover:text-red-400">{label}</span>
