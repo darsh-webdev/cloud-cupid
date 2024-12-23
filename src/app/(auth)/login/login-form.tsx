@@ -6,6 +6,8 @@ import { GiPadlock } from "react-icons/gi";
 import { useForm } from "react-hook-form";
 import { loginSchema, LoginSchema } from "@/lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signInUser } from "@/app/actions/authActions";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const {
@@ -17,10 +19,21 @@ export default function LoginForm() {
     mode: "onTouched",
   });
 
-  const onSubmit = (data: LoginSchema) => console.log(data);
+  const route = useRouter();
+
+  const onSubmit = async (data: LoginSchema) => {
+    const result = await signInUser(data);
+    console.log("🚀 ~ onSubmit ~ result:", result);
+    if (result.status === "success") {
+      route.push("/members");
+    } else {
+      console.log("🚀 ~ onSubmit ~ result.error:", result.error);
+      console.error(result.error as string);
+    }
+  };
 
   return (
-    <Card className="w-3/5 mx-auto">
+    <Card className="w-[40%] mx-auto">
       <CardHeader className="flex flex-col items-center justify-center">
         <div className="flex flex-col gap-2 items-center text-default">
           <div className="flex flex-row items-center gap-3">

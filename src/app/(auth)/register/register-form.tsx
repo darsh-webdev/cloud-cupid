@@ -1,5 +1,6 @@
 "use client";
 
+import { registerUser } from "@/app/actions/authActions";
 import { RegisterSchema, registerSchema } from "@/lib/schemas/RegisterSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardHeader, CardBody, Button, Input } from "@nextui-org/react";
@@ -11,16 +12,39 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isValid, isSubmitting },
   } = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
     mode: "onTouched",
   });
 
-  const onSubmit = (data: RegisterSchema) => console.log(data);
+  const onSubmit = async (data: RegisterSchema) => {
+    const result = await registerUser(data);
+    console.log("🚀 ~ onSubmit ~ result:", result);
+
+    if (result.status === "success") {
+      console.log("User registered successfully");
+    } else {
+      if (Array.isArray(result.error)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        result.error.forEach((e: any) => {
+          console.log("🚀 ~ result.error.forEach ~ e:", e);
+          const fieldName = e.path.join(".") as "email" | "name" | "password";
+          setError(fieldName, {
+            message: e.message,
+          });
+        });
+      } else {
+        setError("root.serverError", {
+          message: result.error,
+        });
+      }
+    }
+  };
 
   return (
-    <Card className="w-3/5 mx-auto">
+    <Card className="w-[40%] mx-auto">
       <CardHeader className="flex flex-col items-center justify-center">
         <div className="flex flex-col gap-2 items-center text-default">
           <div className="flex flex-row items-center gap-3">
