@@ -8,6 +8,7 @@ import { loginSchema, LoginSchema } from "@/lib/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInUser } from "@/app/actions/authActions";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function LoginForm() {
   const {
@@ -19,16 +20,18 @@ export default function LoginForm() {
     mode: "onTouched",
   });
 
-  const route = useRouter();
+  const router = useRouter();
 
   const onSubmit = async (data: LoginSchema) => {
     const result = await signInUser(data);
     console.log("🚀 ~ onSubmit ~ result:", result);
     if (result.status === "success") {
-      route.push("/members");
+      router.push("/members");
+      toast.success("Logged in successfully");
+      router.refresh();
     } else {
       console.log("🚀 ~ onSubmit ~ result.error:", result.error);
-      console.error(result.error as string);
+      toast.error(result.error as string);
     }
   };
 

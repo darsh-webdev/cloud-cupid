@@ -7,6 +7,7 @@ import { Card, CardHeader, CardBody, Button, Input } from "@nextui-org/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { GiPadlock } from "react-icons/gi";
+import { toast } from "react-toastify";
 
 export default function RegisterForm() {
   const {
@@ -25,6 +26,7 @@ export default function RegisterForm() {
 
     if (result.status === "success") {
       console.log("User registered successfully");
+      toast.success("User registered successfully");
     } else {
       if (Array.isArray(result.error)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
