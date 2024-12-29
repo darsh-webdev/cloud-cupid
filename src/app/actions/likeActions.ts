@@ -36,7 +36,7 @@ export async function fetchCurrentUserLikeIds() {
 
     const likeIds = await prisma.like.findMany({
       where: {
-        sourcUserId: userId,
+        sourceUserId: userId,
       },
       select: {
         targetUserId: true,
@@ -65,7 +65,7 @@ export async function fetchLikedMembers(type = "source") {
         return [];
     }
   } catch (error) {
-    console.log(error);
+    console.log("🚀 ~ fetchLikedMembers ~ error:", error);
     throw error;
   }
 }
