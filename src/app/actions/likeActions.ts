@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getAuthUserId } from "./authActions";
+import { Like } from "@prisma/client/wasm";
 
 export async function toggleLikeMember(targetUserId: string, isLiked: boolean) {
   try {
@@ -43,7 +44,7 @@ export async function fetchCurrentUserLikeIds() {
       },
     });
 
-    return likeIds.map((like) => like.targetUserId);
+    return likeIds.map((like: Like) => like.targetUserId);
   } catch (error) {
     console.log("🚀 ~ fetchCurrentUserLikeIds ~ error:", error);
     throw error;
