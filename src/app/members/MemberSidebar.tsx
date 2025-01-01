@@ -49,8 +49,8 @@ export default function MemberSidebar({ member, navLinks }: Props) {
               className={`block rounded 
                                 ${
                                   pathname === link.href
-                                    ? "text-default"
-                                    : "hover:text-default/50"
+                                    ? "text-secondary"
+                                    : "hover:text-secondary/50"
                                 }`}
             >
               {link.name}

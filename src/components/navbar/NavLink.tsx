@@ -15,7 +15,7 @@ export default function NavLink({ href, label }: Props) {
   console.log("🚀 ~ NavLink ~ pathname:", pathname);
   return (
     <NavbarItem isActive={pathname === href} as={Link} href={href}>
-      <span className="hover:text-red-400">{label}</span>
+      <span className=" hover:text-secondary">{label}</span>
     </NavbarItem>
   );
 }
