@@ -11,6 +11,7 @@ import { Button, Input, Textarea } from "@nextui-org/react";
 import { updateMemberProfile } from "@/app/actions/userActions";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { handleFormServerErrors } from "@/lib/utils";
 
 type Props = {
   member: Member;
@@ -50,14 +51,7 @@ const EditForm = ({ member }: Props) => {
       router.refresh();
       reset({ ...data });
     } else {
-      if (Array.isArray(result.error)) {
-        result.error.forEach((error: any) => {
-          const fieldName = error.path.join(".");
-          setError(fieldName, { message: error.message });
-        });
-      } else {
-        setError("root.serverError", { message: result.error });
-      }
+      handleFormServerErrors(result, setError);
     }
   };
 

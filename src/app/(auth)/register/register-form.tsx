@@ -2,6 +2,7 @@
 
 import { registerUser } from "@/app/actions/authActions";
 import { RegisterSchema, registerSchema } from "@/lib/schemas/RegisterSchema";
+import { handleFormServerErrors } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardHeader, CardBody, Button, Input } from "@nextui-org/react";
 import React from "react";
@@ -28,20 +29,7 @@ export default function RegisterForm() {
       console.log("User registered successfully");
       toast.success("User registered successfully");
     } else {
-      if (Array.isArray(result.error)) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        result.error.forEach((e: any) => {
-          console.log("🚀 ~ result.error.forEach ~ e:", e);
-          const fieldName = e.path.join(".") as "email" | "name" | "password";
-          setError(fieldName, {
-            message: e.message,
-          });
-        });
-      } else {
-        setError("root.serverError", {
-          message: result.error,
-        });
-      }
+      handleFormServerErrors(result, setError);
     }
   };
 
