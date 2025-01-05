@@ -89,7 +89,7 @@ export async function setMainImage(photo: Photo) {
       data: { image: photo.url },
     });
   } catch (error) {
-    console.log(error);
+    console.log("🚀 ~ setMainImage ~ error:", error);
     throw error;
   }
 }
@@ -111,7 +111,7 @@ export async function deleteImage(photo: Photo) {
       },
     });
   } catch (error) {
-    console.log(error);
+    console.log("🚀 ~ deleteImage ~ error:", error);
     throw error;
   }
 }
@@ -119,6 +119,7 @@ export async function deleteImage(photo: Photo) {
 export async function getUserInfoForNav() {
   try {
     const userId = await getAuthUserId();
+    console.log("🚀 ~ getUserInfoForNav ~ userId:", userId);
     return prisma.user.findUnique({
       where: { id: userId },
       select: {
