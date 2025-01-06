@@ -1,5 +1,4 @@
 import React from "react";
-import { CardHeader, Divider, CardBody } from "@nextui-org/react";
 import { getAuthUserId } from "@/app/actions/authActions";
 import {
   getMemberByUserId,
@@ -8,6 +7,7 @@ import {
 import { notFound } from "next/navigation";
 import MemberPhotos from "@/components/MemberPhotos";
 import MemberPhotoUpload from "./MemberPhotoUpload";
+import CardInnerWrapper from "@/components/CardInnerWrapper";
 
 const PhotosPage = async () => {
   const userId = await getAuthUserId();
@@ -17,20 +17,19 @@ const PhotosPage = async () => {
 
   return (
     <>
-      <CardHeader className="flex flex-row justify-between items-center">
-        <div className="text-2xl font-semibold text-secondary">
-          Edit Profile
-        </div>
-      </CardHeader>
-      <Divider />
-      <CardBody>
-        <MemberPhotoUpload />
-        <MemberPhotos
-          photos={photos}
-          editing={true}
-          mainImageUrl={member.image}
-        />
-      </CardBody>
+      <CardInnerWrapper
+        header="Edit Profile"
+        body={
+          <>
+            <MemberPhotoUpload />
+            <MemberPhotos
+              photos={photos}
+              editing={true}
+              mainImageUrl={member.image}
+            />
+          </>
+        }
+      />
     </>
   );
 };
