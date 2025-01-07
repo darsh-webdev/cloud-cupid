@@ -1,6 +1,7 @@
 import React from "react";
 import CardInnerWrapper from "@/components/CardInnerWrapper";
+import ChatForm from "./ChatForm";
 
 export default function ChatPage() {
-  return <CardInnerWrapper header="Chat" body="Chat goes here" />;
+  return <CardInnerWrapper header="Chat" body={<ChatForm />} />;
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { getMembers } from "../actions/memberActions";
-import { Member } from "@prisma/client";
+import { Member } from "@prisma/client/wasm";
 import MemberCard from "./MemberCard";
 import { fetchCurrentUserLikeIds } from "../actions/likeActions";
 
