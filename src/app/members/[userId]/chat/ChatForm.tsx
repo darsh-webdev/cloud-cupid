@@ -1,5 +1,6 @@
 "use client";
 
+import { createMessage } from "@/app/actions/messageActions";
 import { MessageSchema, messageSchema } from "@/lib/schemas/MessageSchema";
 import { handleFormServerErrors } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +24,14 @@ export default function ChatForm() {
   });
 
   const onSubmit = async (data: MessageSchema) => {
-    console.log("🚀 ~ onSubmit ~ data:", data);
+    const result = await createMessage(params.userId, data);
+
+    if (result.status === "error") {
+      handleFormServerErrors(result, setError);
+    } else {
+      reset();
+      router.refresh();
+    }
   };
 
   return (
