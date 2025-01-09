@@ -99,3 +99,90 @@ export async function getMessageThread(recipientId: string) {
     throw error;
   }
 }
+
+export async function getMessagesByContainer(container: string) {
+  try {
+    const userId = await getAuthUserId();
+
+    const outboxConditions = { senderId: userId, senderDeleted: false };
+    const inboxConditions = { recipientId: userId, recipientDeleted: false };
+
+    const conditions =
+      container === "outbox" ? outboxConditions : inboxConditions;
+
+    const messages = await prisma.message.findMany({
+      where: conditions,
+      orderBy: {
+        created: "desc",
+      },
+      select: {
+        id: true,
+        text: true,
+        created: true,
+        dateRead: true,
+        sender: {
+          select: {
+            userId: true,
+            name: true,
+            image: true,
+          },
+        },
+        recipient: {
+          select: {
+            userId: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return messages.map((message: Message) => mapMessageToMessageDto(message));
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function deleteMessage(messageId: string, isOutbox: boolean) {
+  const selector = isOutbox ? "senderDeleted" : "recipientDeleted";
+
+  try {
+    const userId = await getAuthUserId();
+
+    await prisma.message.update({
+      where: { id: messageId },
+      data: {
+        [selector]: true,
+      },
+    });
+
+    const messagesToDelete = await prisma.message.findMany({
+      where: {
+        OR: [
+          {
+            senderId: userId,
+            senderDeleted: true,
+            recipientDeleted: true,
+          },
+          {
+            recipientId: userId,
+            senderDeleted: true,
+            recipientDeleted: true,
+          },
+        ],
+      },
+    });
+
+    if (messagesToDelete.length > 0) {
+      await prisma.message.deleteMany({
+        where: {
+          OR: messagesToDelete.map((m) => ({ id: m.id })),
+        },
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
