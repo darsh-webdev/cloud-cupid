@@ -100,7 +100,7 @@ export default function MessageTable({ messages }: Props) {
             <Button
               isIconOnly
               variant="light"
-              onClick={() => handleDeleteMessage(item)}
+              onPress={() => handleDeleteMessage(item)}
               isLoading={isDeleting.id === item.id && isDeleting.loading}
             >
               <AiFillDelete size={24} className="text-danger" />

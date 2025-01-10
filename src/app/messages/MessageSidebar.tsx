@@ -43,7 +43,7 @@ export default function MessageSidebar() {
         <div
           key={key}
           className={clsx("flex flex-row items-center rounded-t-lg gap-2 p-3", {
-            "text-default font-semibold": selected === key,
+            "text-secondary font-semibold": selected === key,
             "text-black hover:text-default/70": selected !== key,
           })}
           onClick={() => handleSelect(key)}
