@@ -24,6 +24,10 @@ if (!global.pusherClientInstance) {
     process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
     {
       cluster: CLUSTER,
+      channelAuthorization: {
+        endpoint: "/api/pusher-auth",
+        transport: "ajax",
+      },
     }
   );
 }
