@@ -5,7 +5,9 @@ import { Channel, Members } from "pusher-js";
 import { pusherClient } from "@/lib/pusher";
 
 export const usePresenceChannel = () => {
-  const { setMembersId, add, remove } = usePresenceStore();
+  const setMembersId = usePresenceStore((state) => state.setMembersId);
+  const add = usePresenceStore((state) => state.add);
+  const remove = usePresenceStore((state) => state.remove);
 
   const channelRef = useRef<Channel | null>(null);
 
@@ -65,6 +67,7 @@ export const usePresenceChannel = () => {
         );
         channelRef.current.unbind("pusher:member_added", handleAddMember);
         channelRef.current.unbind("pusher:member_removed", handleRemoveMember);
+        channelRef.current = null;
       }
     };
   }, [handleAddMember, handleRemoveMember, handleSetMembers]);
