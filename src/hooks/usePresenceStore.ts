@@ -5,7 +5,7 @@ type PresenceState = {
   membersId: string[];
   add: (id: string) => void;
   remove: (id: string) => void;
-  set: (ids: string[]) => void;
+  setMembersId: (ids: string[]) => void;
 };
 
 const usePresenceStore = create<PresenceState>()(
@@ -17,7 +17,7 @@ const usePresenceStore = create<PresenceState>()(
         set((state) => ({
           membersId: state.membersId.filter((memberId) => memberId !== id),
         })),
-      set: (ids) => set({ membersId: ids }),
+      setMembersId: (ids) => set({ membersId: ids }),
     }),
     { name: "PresenceStoreDemo" }
   )

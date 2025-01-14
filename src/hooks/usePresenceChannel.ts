@@ -1,22 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef } from "react";
 import usePresenceStore from "./usePresenceStore";
 import { Channel, Members } from "pusher-js";
 import { pusherClient } from "@/lib/pusher";
 
 export const usePresenceChannel = () => {
-  const { set, add, remove } = usePresenceStore((state) => ({
-    set: state.set,
-    add: state.add,
-    remove: state.remove,
-  }));
+  const { setMembersId, add, remove } = usePresenceStore();
 
   const channelRef = useRef<Channel | null>(null);
 
   const handleSetMembers = useCallback(
     (memberIds: string[]) => {
-      set(memberIds);
+      setMembersId(memberIds);
     },
-    [set]
+    [setMembersId]
   );
 
   const handleAddMember = useCallback(
