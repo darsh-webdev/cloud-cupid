@@ -78,6 +78,7 @@ export async function getMessageThread(recipientId: string) {
       select: messageSelect,
     });
 
+    let readCount;
     if (messages.length > 0) {
       const unreadMessageIds = messages
         .filter(
@@ -97,6 +98,8 @@ export async function getMessageThread(recipientId: string) {
         data: { dateRead: new Date() },
       });
 
+      readCount = unreadMessageIds.length;
+
       await pusherServer.trigger(
         createChatId(recipientId, userId),
         "messages:read",
@@ -104,9 +107,12 @@ export async function getMessageThread(recipientId: string) {
       );
     }
 
-    return messages.map((message: MessageDto) =>
-      mapMessageToMessageDto(message)
-    );
+    return {
+      messages: messages.map((message: MessageDto) =>
+        mapMessageToMessageDto(message)
+      ),
+      readCount,
+    };
   } catch (error) {
     console.log(error);
     throw error;
@@ -177,6 +183,23 @@ export async function deleteMessage(messageId: string, isOutbox: boolean) {
     }
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+}
+
+export async function getUnreadMessageCount() {
+  try {
+    const userId = await getAuthUserId();
+
+    return prisma.message.count({
+      where: {
+        recipientId: userId,
+        dateRead: null,
+        recipientDeleted: false,
+      },
+    });
+  } catch (error) {
+    console.log("🚀 ~ getUnreadMessageCount ~ error:", error);
     throw error;
   }
 }

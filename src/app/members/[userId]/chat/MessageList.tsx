@@ -1,18 +1,29 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MessageDto } from "@/types";
 import MessageBox from "./MessageBox";
 import { pusherClient } from "@/lib/pusher";
 import { formatShortDateTime } from "@/lib/utils";
+import useMessageStore from "@/hooks/useMessageStore";
 
 type Props = {
-  initialMessages: MessageDto[];
+  initialMessages: { messages: MessageDto[]; readCount: number };
   currentUserId: string;
   chatId: string;
 };
 
 const MessageList = ({ initialMessages, currentUserId, chatId }: Props) => {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState(initialMessages.messages);
+
+  const updateUnreadCount = useMessageStore((state) => state.updateUnreadCount);
+  const setReadCount = useRef(false);
+
+  useEffect(() => {
+    if (!setReadCount.current) {
+      updateUnreadCount(-initialMessages.readCount);
+      setReadCount.current = true;
+    }
+  }, [initialMessages.readCount, updateUnreadCount]);
 
   const handleNewMessage = useCallback((message: MessageDto) => {
     setMessages((prevState) => [...prevState, message]);

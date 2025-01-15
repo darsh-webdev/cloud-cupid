@@ -1,5 +1,6 @@
 "use client";
 
+import useMessageStore from "@/hooks/useMessageStore";
 import { Chip } from "@nextui-org/react";
 import clsx from "clsx";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -14,6 +15,8 @@ export default function MessageSidebar() {
   const [selected, setSelected] = useState<string>(
     searchParams.get("container") || "inbox"
   );
+
+  const unreadCount = useMessageStore((state) => state.unreadCount);
 
   const items = [
     {
@@ -49,10 +52,9 @@ export default function MessageSidebar() {
           onClick={() => handleSelect(key)}
         >
           <Icon size={24} />
-          <div className="flex justify-between flex-grow">
+          <div className="flex justify-between flex-grow gap-1">
             <span>{label}</span>
-            {chip && <Chip>2</Chip>}
-            {/* Demo Purpose: will change the incoming messages count in upcoming commits */}
+            {chip && <Chip>{unreadCount}</Chip>}
           </div>
         </div>
       ))}
