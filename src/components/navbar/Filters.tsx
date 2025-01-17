@@ -37,13 +37,13 @@ const Filters = () => {
             maxValue={99}
             defaultValue={18}
             aria-label="Age range slider"
-            color="foreground"
+            color="secondary"
           />
         </div>
 
         <div className="flex flex-col items-center">
           <p className="text-sm">With Photo</p>
-          <Switch color="default" defaultSelected size="sm" />
+          <Switch color="secondary" defaultSelected size="sm" />
         </div>
 
         <div className="w-1/4">
