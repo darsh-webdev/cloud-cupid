@@ -4,9 +4,14 @@ import { Member } from "@prisma/client/wasm";
 import MemberCard from "./MemberCard";
 import { fetchCurrentUserLikeIds } from "../actions/likeActions";
 import PaginationComponent from "@/components/PaginationComponent";
+import { GetMemberParams } from "@/types";
 
-const MembersPage = async () => {
-  const members = await getMembers();
+const MembersPage = async ({
+  searchParams,
+}: {
+  searchParams: GetMemberParams;
+}) => {
+  const { items: members, totalCount } = await getMembers(searchParams);
 
   const likeIds = await fetchCurrentUserLikeIds();
 

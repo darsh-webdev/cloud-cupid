@@ -1,4 +1,5 @@
 import { Button, Select, SelectItem, Slider, Switch } from "@nextui-org/react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { FaFemale, FaMale } from "react-icons/fa";
 
@@ -12,6 +13,17 @@ const Filters = () => {
     { value: "male", icon: FaMale },
     { value: "female", icon: FaFemale },
   ];
+
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const handleAgeSelect = (value: number[]) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("ageRange", value.toString());
+    console.log("🚀 ~ handleAgeSelect ~ params:", params);
+    router.replace(`${pathname}?${params}`);
+  };
 
   return (
     <div className="shadow-md py-2">
@@ -35,9 +47,10 @@ const Filters = () => {
             size="sm"
             minValue={18}
             maxValue={99}
-            defaultValue={18}
+            defaultValue={[19, 50]}
             aria-label="Age range slider"
             color="secondary"
+            onChangeEnd={(values) => handleAgeSelect(values as number[])}
           />
         </div>
 
