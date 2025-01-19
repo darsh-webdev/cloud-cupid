@@ -2,6 +2,7 @@ import { Button, Select, SelectItem, Slider, Switch } from "@nextui-org/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { FaFemale, FaMale } from "react-icons/fa";
+import { Selection } from "@nextui-org/react";
 
 const Filters = () => {
   const orderByList = [
@@ -23,6 +24,14 @@ const Filters = () => {
     params.set("ageRange", value.toString());
     console.log("🚀 ~ handleAgeSelect ~ params:", params);
     router.replace(`${pathname}?${params}`);
+  };
+
+  const handleOrderSelect = (value: Selection) => {
+    if (value instanceof Set) {
+      const params = new URLSearchParams(searchParams);
+      params.set("orderBy", String(value.values().next().value ?? "updated"));
+      router.replace(`${pathname}?${params}`);
+    }
   };
 
   return (
@@ -67,6 +76,8 @@ const Filters = () => {
             variant="bordered"
             color="default"
             aria-label="Order by selector"
+            selectedKeys={new Set([searchParams.get("orderBy") || "updated"])}
+            onSelectionChange={handleOrderSelect}
           >
             {orderByList.map((item) => (
               <SelectItem key={item.value} value={item.value}>
