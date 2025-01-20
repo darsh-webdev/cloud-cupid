@@ -22,7 +22,6 @@ const Filters = () => {
   const handleAgeSelect = (value: number[]) => {
     const params = new URLSearchParams(searchParams);
     params.set("ageRange", value.toString());
-    console.log("🚀 ~ handleAgeSelect ~ params:", params);
     router.replace(`${pathname}?${params}`);
   };
 
@@ -32,6 +31,24 @@ const Filters = () => {
       params.set("orderBy", String(value.values().next().value ?? "updated"));
       router.replace(`${pathname}?${params}`);
     }
+  };
+
+  const selectedGender = searchParams.get("gender")?.split(",") || [
+    "male",
+    "female",
+  ];
+
+  const handleGenderSelect = (selectGender: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (selectedGender.includes(selectGender)) {
+      params.set(
+        "gender",
+        selectedGender.filter((gender) => gender !== selectGender).toString()
+      );
+    } else {
+      params.set("gender", [...selectedGender, selectGender].toString());
+    }
+    router.replace(`${pathname}?${params}`);
   };
 
   return (
@@ -44,7 +61,14 @@ const Filters = () => {
         <div className="flex gap-2 items-center">
           <div>Gender:</div>
           {genderList.map(({ icon: Icon, value }) => (
-            <Button key={value} size="sm" isIconOnly color="default">
+            <Button
+              key={value}
+              size="sm"
+              isIconOnly
+              color="default"
+              variant={selectedGender.includes(value) ? "solid" : "light"}
+              onPress={() => handleGenderSelect(value)}
+            >
               <Icon size={24} />
             </Button>
           ))}
