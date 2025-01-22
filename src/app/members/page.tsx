@@ -5,6 +5,7 @@ import MemberCard from "./MemberCard";
 import { fetchCurrentUserLikeIds } from "../actions/likeActions";
 import PaginationComponent from "@/components/PaginationComponent";
 import { GetMemberParams } from "@/types";
+import NoResultsCard from "@/components/NoResultsCard";
 
 const MembersPage = async ({
   searchParams,
@@ -14,6 +15,10 @@ const MembersPage = async ({
   const { items: members, totalCount } = await getMembers(searchParams);
 
   const likeIds = await fetchCurrentUserLikeIds();
+
+  if (members.length === 0) {
+    return <NoResultsCard />;
+  }
 
   return (
     <>
