@@ -55,3 +55,13 @@ type GetMemberParams = {
   pageNumber?: string;
   pageSize?: string;
 };
+
+type PagingParams = {
+  pageNumber: number;
+  pageSize: number;
+};
+
+type PagingResult = {
+  totalCount: number;
+  totalPages: number;
+} & PagingParams;

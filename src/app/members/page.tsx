@@ -23,7 +23,7 @@ const MembersPage = async ({
             <MemberCard key={member.id} member={member} likeIds={likeIds} />
           ))}
       </div>
-      <PaginationComponent />
+      <PaginationComponent totalCount={totalCount} />
     </>
   );
 };
