@@ -46,6 +46,7 @@ export const useMessages = (
 
   useEffect(() => {
     setMessages(initialMessages);
+    cursorRef.current = nextCursor;
 
     return () => {
       resetMessages();
