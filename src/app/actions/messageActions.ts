@@ -82,12 +82,12 @@ export async function getMessageThread(recipientId: string) {
     if (messages.length > 0) {
       const unreadMessageIds = messages
         .filter(
-          (message) =>
+          (message: Message) =>
             message.dateRead === null &&
             message.recipient?.userId === userId &&
             message.sender?.userId === userId
         )
-        .map((message) => message.id);
+        .map((message: Message) => message.id);
 
       await prisma.message.updateMany({
         where: {
@@ -119,25 +119,47 @@ export async function getMessageThread(recipientId: string) {
   }
 }
 
-export async function getMessagesByContainer(container: string) {
+export async function getMessagesByContainer(
+  container: string,
+  cursor?: string,
+  limit = 2
+) {
   try {
     const userId = await getAuthUserId();
 
-    const outboxConditions = { senderId: userId, senderDeleted: false };
-    const inboxConditions = { recipientId: userId, recipientDeleted: false };
-
-    const conditions =
-      container === "outbox" ? outboxConditions : inboxConditions;
+    const conditions = {
+      [container === "outbox" ? "senderId" : "recipientId"]: userId,
+      ...(container === "outbox"
+        ? { senderDeleted: false }
+        : { recipientDeleted: false }),
+    };
 
     const messages = await prisma.message.findMany({
-      where: conditions,
+      where: {
+        ...conditions,
+        ...(cursor ? { created: { lte: new Date(cursor) } } : {}),
+      },
       orderBy: {
         created: "desc",
       },
       select: messageSelect,
+      take: limit + 1,
     });
 
-    return messages.map((message: Message) => mapMessageToMessageDto(message));
+    let nextCursor: string | undefined;
+
+    if (messages.length > limit) {
+      const nextItem = messages.pop();
+      nextCursor = nextItem?.created.toISOString();
+    } else {
+      nextCursor = undefined;
+    }
+
+    const messagesToReturn = messages.map((message: Message) =>
+      mapMessageToMessageDto(message)
+    );
+
+    return { messages: messagesToReturn, nextCursor };
   } catch (error) {
     console.log(error);
     throw error;
