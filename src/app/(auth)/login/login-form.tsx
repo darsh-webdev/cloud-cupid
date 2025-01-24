@@ -40,8 +40,8 @@ export default function LoginForm() {
       <CardHeader className="flex flex-col items-center justify-center">
         <div className="flex flex-col gap-2 items-center text-default">
           <div className="flex flex-row items-center gap-3">
-            <GiPadlock size={30} />
-            <h1 className="text-3xl font-semibold">Login</h1>
+            <GiPadlock size={30} className="text-secondary-500" />
+            <h1 className="text-3xl font-semibold text-secondary-500">Login</h1>
           </div>
           <p className="text-neutral-500">Welcome back to CloudCupid!</p>
         </div>
@@ -68,7 +68,7 @@ export default function LoginForm() {
             />
             <Button
               fullWidth
-              color="danger"
+              color="secondary"
               type="submit"
               isDisabled={!isValid}
             >

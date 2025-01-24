@@ -1,88 +1,106 @@
 "use client";
 
 import { registerUser } from "@/app/actions/authActions";
-import { RegisterSchema, registerSchema } from "@/lib/schemas/RegisterSchema";
+import {
+  profileSchema,
+  RegisterSchema,
+  registerSchema,
+} from "@/lib/schemas/RegisterSchema";
 import { handleFormServerErrors } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardHeader, CardBody, Button, Input } from "@nextui-org/react";
-import React from "react";
-import { useForm } from "react-hook-form";
+import { Card, CardHeader, CardBody, Button } from "@nextui-org/react";
+import React, { useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import { GiPadlock } from "react-icons/gi";
 import { toast } from "react-toastify";
+import UserDetailsForm from "./user-details-form";
+import ProfileDetailsForm from "./profile-details-form";
+
+const stepSchemas = [registerSchema, profileSchema];
 
 export default function RegisterForm() {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm<RegisterSchema>({
+  const [activeStep, setActiveStep] = useState(0);
+  const currentStepSchema = stepSchemas[activeStep];
+
+  const registerFormMethods = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema),
     mode: "onTouched",
   });
 
-  const onSubmit = async (data: RegisterSchema) => {
-    const result = await registerUser(data);
-    console.log("🚀 ~ onSubmit ~ result:", result);
+  const {
+    handleSubmit,
+    setError,
+    formState: { isValid, isSubmitting },
+  } = registerFormMethods;
 
-    if (result.status === "success") {
-      console.log("User registered successfully");
-      toast.success("User registered successfully");
+  const onSubmit = async () => {
+    console.log("🚀 ~ onSubmit ~ onSubmitTriggered:");
+  };
+
+  const getStepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return <UserDetailsForm />;
+
+      case 1:
+        return <ProfileDetailsForm />;
+
+      default:
+        return "Unknown step";
+    }
+  };
+
+  const onBack = () => {
+    setActiveStep((prev) => prev - 1);
+  };
+
+  const onNext = async () => {
+    if (activeStep === stepSchemas.length - 1) {
+      await onSubmit();
     } else {
-      handleFormServerErrors(result, setError);
+      setActiveStep((prev) => prev + 1);
     }
   };
 
   return (
-    <Card className="w-[40%] mx-auto">
+    <Card className="w-[40%] mx-auto mt-[200px]">
       <CardHeader className="flex flex-col items-center justify-center">
         <div className="flex flex-col gap-2 items-center text-default">
           <div className="flex flex-row items-center gap-3">
-            <GiPadlock size={30} />
-            <h1 className="text-3xl font-semibold">Register</h1>
+            <GiPadlock size={30} className="text-secondary-500" />
+            <h1 className="text-3xl font-semibold text-secondary-500">
+              Register
+            </h1>
           </div>
           <p className="text-neutral-500">Welcome to CloudCupid</p>
         </div>
       </CardHeader>
       <CardBody>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
-            <Input
-              defaultValue=""
-              label="Name"
-              variant="bordered"
-              {...register("name")}
-              isInvalid={!!errors.name}
-              errorMessage={errors.name?.message}
-            />
-            <Input
-              defaultValue=""
-              label="Email"
-              variant="bordered"
-              {...register("email")}
-              isInvalid={!!errors.email}
-              errorMessage={errors.email?.message}
-            />
-            <Input
-              defaultValue=""
-              label="Password"
-              variant="bordered"
-              type="password"
-              {...register("password")}
-              isInvalid={!!errors.password}
-              errorMessage={errors.password?.message}
-            />
-            <Button
-              isLoading={isSubmitting}
-              isDisabled={!isValid}
-              fullWidth
-              color="danger"
-              type="submit"
-            >
-              Register
-            </Button>
-          </div>
-        </form>
+        <FormProvider {...registerFormMethods}>
+          <form onSubmit={handleSubmit(onNext)}>
+            <div className="space-y-4">
+              {getStepContent(activeStep)}
+              <div className="flex flex-row items-center gap-6">
+                {activeStep !== 0 && (
+                  <Button onPress={onBack} fullWidth>
+                    Back
+                  </Button>
+                )}
+                <Button
+                  isLoading={isSubmitting}
+                  isDisabled={!isValid}
+                  fullWidth
+                  color="secondary"
+                  type="submit"
+                >
+                  {activeStep === stepSchemas.length - 1
+                    ? "Submit"
+                    : "Continue"}
+                </Button>
+              </div>
+            </div>
+          </form>
+        </FormProvider>
       </CardBody>
     </Card>
   );
