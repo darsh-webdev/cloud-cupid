@@ -15,6 +15,7 @@ import { GiPadlock } from "react-icons/gi";
 import { toast } from "react-toastify";
 import UserDetailsForm from "./user-details-form";
 import ProfileDetailsForm from "./profile-details-form";
+import { useRouter } from "next/navigation";
 
 const stepSchemas = [registerSchema, profileSchema];
 
@@ -22,19 +23,30 @@ export default function RegisterForm() {
   const [activeStep, setActiveStep] = useState(0);
   const currentStepSchema = stepSchemas[activeStep];
 
+  const router = useRouter();
+
   const registerFormMethods = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(currentStepSchema),
     mode: "onTouched",
   });
 
   const {
     handleSubmit,
+    getValues,
     setError,
-    formState: { isValid, isSubmitting },
+    formState: { errors, isValid, isSubmitting },
   } = registerFormMethods;
 
   const onSubmit = async () => {
-    console.log("🚀 ~ onSubmit ~ onSubmitTriggered:");
+    console.log(getValues());
+    const result = await registerUser(getValues());
+    if (result.status === "success") {
+      toast.success("User registered successfully!");
+      router.push("/register/success");
+    } else {
+      toast.error("User registration failed");
+      handleFormServerErrors(result, setError);
+    }
   };
 
   const getStepContent = (step: number) => {
@@ -80,6 +92,11 @@ export default function RegisterForm() {
           <form onSubmit={handleSubmit(onNext)}>
             <div className="space-y-4">
               {getStepContent(activeStep)}
+              {errors.root?.serverError && (
+                <p className="text-danger text-sm">
+                  {errors.root.serverError.message}
+                </p>
+              )}
               <div className="flex flex-row items-center gap-6">
                 {activeStep !== 0 && (
                   <Button onPress={onBack} fullWidth>

@@ -20,7 +20,6 @@ export default function ProfileDetailsForm() {
   return (
     <div className="space-y-4">
       <Select
-        defaultSelectedKeys={getValues("gender")}
         label="Gender"
         aria-label="Select gender"
         variant="bordered"
