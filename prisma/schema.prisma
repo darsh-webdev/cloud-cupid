@@ -86,6 +86,21 @@ model Message {
   recipientDeleted Boolean   @default(false)
 }
 
+model Token {
+  id      String    @id @default(cuid())
+  email   String
+  token   String
+  expires DateTime
+  type    TokenType
+
+  @@unique([email, token])
+}
+
+enum TokenType {
+  VERIFICATION
+  PASSWORD_RESET
+}
+
 enum Role {
   ADMIN
   MEMBER
