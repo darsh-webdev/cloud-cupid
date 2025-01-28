@@ -7,15 +7,38 @@ import {
   combinedRegisterSchema,
   RegisterSchema,
 } from "@/lib/schemas/RegisterSchema";
+import { generateToken, getTokenByToken } from "@/lib/tokens";
 import { ActionResult } from "@/types";
 import { User } from "@prisma/client/wasm";
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
+import { TokenType } from "@prisma/client/wasm";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export async function signInUser(
   data: LoginSchema
 ): Promise<ActionResult<string>> {
   try {
+    const existingUser = await getUserByEmail(data.email);
+
+    if (!existingUser || !existingUser.email)
+      return { status: "error", error: "Invalid credentials" };
+
+    if (!existingUser.emailVerified) {
+      const { token, email } = await generateToken(
+        existingUser.email,
+        TokenType.VERIFICATION
+      );
+
+      // Send the verification token
+      await sendVerificationEmail(email, token);
+
+      return {
+        status: "error",
+        error: "Please verify your email before logging in",
+      };
+    }
+
     await signIn("credentials", {
       email: data.email,
       password: data.password,
@@ -40,6 +63,42 @@ export async function signInUser(
 
 export async function signOutUser() {
   await signOut({ redirectTo: "/login" });
+}
+
+export async function verifyEmail(
+  token: string
+): Promise<ActionResult<string>> {
+  try {
+    const existingToken = await getTokenByToken(token);
+
+    if (!existingToken) {
+      return { status: "error", error: "Invalid token" };
+    }
+
+    const hasExpired = new Date() > existingToken.expires;
+
+    if (hasExpired) {
+      return { status: "error", error: "Token has expired" };
+    }
+
+    const existingUser = await getUserByEmail(existingToken.email);
+
+    if (!existingUser) {
+      return { status: "error", error: "User not found" };
+    }
+
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: { emailVerified: new Date() },
+    });
+
+    await prisma.token.delete({ where: { id: existingToken.id } });
+
+    return { status: "success", data: "Success" };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 }
 
 export async function registerUser(
@@ -88,6 +147,17 @@ export async function registerUser(
         },
       },
     });
+
+    const verificationToken = await generateToken(
+      email,
+      TokenType.VERIFICATION
+    );
+
+    // Send the verification token
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    );
 
     return { status: "success", data: user };
   } catch (error) {
