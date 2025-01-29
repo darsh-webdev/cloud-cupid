@@ -13,7 +13,7 @@ import { User } from "@prisma/client/wasm";
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { TokenType } from "@prisma/client/wasm";
-import { sendVerificationEmail } from "@/lib/mail";
+import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/mail";
 
 export async function signInUser(
   data: LoginSchema
@@ -166,6 +166,30 @@ export async function registerUser(
   }
 }
 
+export async function generateResetPasswordEmail(
+  email: string
+): Promise<ActionResult<string>> {
+  try {
+    const existingUser = await getUserByEmail(email);
+
+    if (!existingUser) {
+      return { status: "error", error: "Email not found" };
+    }
+
+    const token = await generateToken(email, TokenType.PASSWORD_RESET);
+
+    await sendPasswordResetEmail(token.email, token.token);
+
+    return {
+      status: "success",
+      data: "Password reset email send successfully. Please check your email",
+    };
+  } catch (error) {
+    console.log("🚀 ~ generateResetPasswordEmail ~ error:", error);
+    throw error;
+  }
+}
+
 export async function getUserByEmail(email: string) {
   return prisma.user.findUnique({ where: { email } });
 }
@@ -181,4 +205,50 @@ export async function getAuthUserId() {
   if (!userId) throw new Error("Unauthorized");
 
   return userId;
+}
+
+export async function resetPassword(
+  password: string,
+  token: string | null
+): Promise<ActionResult<string>> {
+  try {
+    if (!token) {
+      return { status: "error", error: "Missing token" };
+    }
+
+    const existingToken = await getTokenByToken(token);
+
+    if (!existingToken) {
+      return { status: "error", error: "Invalid token" };
+    }
+
+    const hasExpired = new Date() > existingToken.expires;
+
+    if (hasExpired) {
+      return { status: "error", error: "Token has expired" };
+    }
+
+    const existingUser = await getUserByEmail(existingToken.email);
+
+    if (!existingUser) {
+      return { status: "error", error: "User not found" };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: { passwordHash: hashedPassword },
+    });
+
+    await prisma.token.delete({ where: { id: existingToken.id } });
+
+    return {
+      status: "success",
+      data: "Password updated successfully. Please login using new password",
+    };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 }
