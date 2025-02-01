@@ -54,7 +54,7 @@ export default function MessageSidebar() {
           <Icon size={24} />
           <div className="flex justify-between flex-grow gap-1">
             <span>{label}</span>
-            {chip && <Chip>{unreadCount}</Chip>}
+            {chip && <Chip>{unreadCount.toString()}</Chip>}
           </div>
         </div>
       ))}
