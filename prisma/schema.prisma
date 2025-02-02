@@ -35,6 +35,7 @@ model User {
   profileComplete Boolean   @default(false)
   accounts        Account[]
   member          Member?
+  role            Role      @default(MEMBER)
 }
 
 model Member {
