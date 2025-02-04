@@ -54,7 +54,7 @@ export default function MemberSidebar({ member, navLinks }: Props) {
                                 ${
                                   pathname === link.href
                                     ? "text-secondary"
-                                    : "hover:text-secondary/50"
+                                    : "hover:text-default"
                                 }`}
             >
               {link.name}
