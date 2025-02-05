@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { LoginSchema } from "@/lib/schemas/LoginSchema";
 import {
   combinedRegisterSchema,
+  ProfileSchema,
   RegisterSchema,
 } from "@/lib/schemas/RegisterSchema";
 import { generateToken, getTokenByToken } from "@/lib/tokens";
@@ -291,4 +292,14 @@ export async function completeSocialLoginProfile(
     console.log(error);
     throw error;
   }
+}
+
+export async function getUserRole() {
+  const session = await auth();
+
+  const role = session?.user.role;
+
+  if (!role) throw new Error("Role not found");
+
+  return role;
 }
