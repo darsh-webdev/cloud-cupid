@@ -7,6 +7,9 @@ import { Button, Image } from "@nextui-org/react";
 import clsx from "clsx";
 import { ImCheckmark, ImCross } from "react-icons/im";
 import { useRole } from "@/hooks/useRole";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { approvePhoto, rejectPhoto } from "@/app/actions/adminActions";
 
 type Props = {
   photo: Photo | null;
@@ -15,6 +18,27 @@ type Props = {
 export default function MemberImage({ photo }: Props) {
   const role = useRole();
   const isAdmin = role === "ADMIN";
+  const router = useRouter();
+
+  if (!photo) return null;
+
+  const handleApprove = async (photoId: string) => {
+    try {
+      await approvePhoto(photoId);
+      router.refresh();
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleReject = async (photo: Photo) => {
+    try {
+      await rejectPhoto(photo);
+      router.refresh();
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div>
@@ -46,10 +70,20 @@ export default function MemberImage({ photo }: Props) {
 
       {isAdmin && (
         <div className="flex flex-row gap-2 mt-2">
-          <Button color="success" variant="bordered" fullWidth>
+          <Button
+            color="success"
+            variant="bordered"
+            fullWidth
+            onPress={() => handleApprove(photo.id)}
+          >
             <ImCheckmark size={20} />
           </Button>
-          <Button color="danger" variant="bordered" fullWidth>
+          <Button
+            color="danger"
+            variant="bordered"
+            fullWidth
+            onPress={() => handleReject(photo)}
+          >
             <ImCross size={20} />
           </Button>
         </div>
