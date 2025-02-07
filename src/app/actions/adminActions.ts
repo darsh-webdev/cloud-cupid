@@ -15,6 +15,13 @@ export async function getUnapprovedPhotos() {
       where: {
         isApproved: false,
       },
+      include: {
+        member: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
   } catch (error) {
     console.log("🚀 ~ getUnapprovedPhotos ~ error:", error);
