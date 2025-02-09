@@ -12,8 +12,9 @@ type Props = {
   photos: Photo[] | null;
   editing?: boolean;
   mainImageUrl?: string | null;
+  members?: { name: string; id: string }[];
 };
-const MemberPhotos = ({ photos, editing, mainImageUrl }: Props) => {
+const MemberPhotos = ({ photos, editing, mainImageUrl, members }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState({
     type: "",
@@ -65,7 +66,10 @@ const MemberPhotos = ({ photos, editing, mainImageUrl }: Props) => {
       {photos &&
         photos.map((photo) => (
           <div key={photo.id} className="relative m-2">
-            <MemberImage photo={photo} />
+            <MemberImage
+              photo={photo}
+              member={members?.find((member) => member.id === photo.memberId)}
+            />
             {editing && (
               <>
                 <div

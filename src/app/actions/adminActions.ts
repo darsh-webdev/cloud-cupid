@@ -11,7 +11,7 @@ export async function getUnapprovedPhotos() {
 
     if (role !== "ADMIN") throw new Error("Unauthorized");
 
-    return prisma.photo.findMany({
+    const photosAndMemberNames = await prisma.photo.findMany({
       where: {
         isApproved: false,
       },
@@ -19,10 +19,18 @@ export async function getUnapprovedPhotos() {
         member: {
           select: {
             name: true,
+            id: true,
           },
         },
       },
     });
+
+    const members = photosAndMemberNames.map((item) => item.member);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const photos = photosAndMemberNames.map(({ member, ...photo }) => photo);
+
+    return { photos, members };
   } catch (error) {
     console.log("🚀 ~ getUnapprovedPhotos ~ error:", error);
     throw error;

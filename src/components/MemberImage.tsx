@@ -13,9 +13,10 @@ import { approvePhoto, rejectPhoto } from "@/app/actions/adminActions";
 
 type Props = {
   photo: Photo | null;
+  member?: { name: string; id: string };
 };
 
-export default function MemberImage({ photo }: Props) {
+export default function MemberImage({ photo, member }: Props) {
   const role = useRole();
   const isAdmin = role === "ADMIN";
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function MemberImage({ photo }: Props) {
     try {
       await approvePhoto(photoId);
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
     }
   };
@@ -35,7 +36,7 @@ export default function MemberImage({ photo }: Props) {
     try {
       await rejectPhoto(photo);
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
     }
   };
@@ -43,7 +44,12 @@ export default function MemberImage({ photo }: Props) {
   return (
     <div>
       {photo?.publicId ? (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center gap-2 border-gray-300 border-2 rounded-xl p-2">
+          {member && (
+            <span className="text-lg text-center font-semibold text-neutral-400">
+              Approve for: {member.name}
+            </span>
+          )}
           <CldImage
             alt="Image of member"
             src={photo.publicId}
@@ -58,7 +64,11 @@ export default function MemberImage({ photo }: Props) {
           />
         </div>
       ) : (
-        <Image src={photo?.url || "/images/user.png"} alt="Image of user" />
+        <Image
+          src={photo?.url || "/images/user.png"}
+          alt="Image of user"
+          className="border-gray-300 border-2 rounded-xl p-2"
+        />
       )}
       {photo && !photo.isApproved && !isAdmin && (
         <div className="absolute bottom-2 w-full bg-slate-200 p-1">
