@@ -43,9 +43,10 @@ export default async function TopNav() {
           </div>
         </NavbarBrand>
         <NavbarContent justify="center">
-          {links.map((link) => (
-            <NavLink href={link.href} label={link.label} key={link.href} />
-          ))}
+          {session &&
+            links.map((link) => (
+              <NavLink href={link.href} label={link.label} key={link.href} />
+            ))}
         </NavbarContent>
         <NavbarContent justify="end">
           {userInfo ? (

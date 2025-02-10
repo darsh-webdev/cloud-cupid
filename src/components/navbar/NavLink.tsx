@@ -22,7 +22,7 @@ export default function NavLink({ href, label }: Props) {
       className="flex items-center justify-center"
     >
       <span className=" hover:text-secondary">{label}</span>
-      {href === "/messages" && unreadCount !== 0 && (
+      {href === "/messages" && unreadCount > 0 && (
         <span className="ml-1">({unreadCount})</span>
       )}
     </NavbarItem>

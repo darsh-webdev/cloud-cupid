@@ -11,7 +11,7 @@ import {
 import { generateToken, getTokenByToken } from "@/lib/tokens";
 import { ActionResult } from "@/types";
 import { User } from "@prisma/client/wasm";
-import bcrypt from "bcryptjs";
+import { hash } from "bcrypt-ts";
 import { AuthError } from "next-auth";
 import { TokenType } from "@prisma/client/wasm";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/mail";
@@ -123,7 +123,7 @@ export async function registerUser(
       description,
     } = validated.data;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hash(password, 10);
 
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -235,7 +235,7 @@ export async function resetPassword(
       return { status: "error", error: "User not found" };
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hash(password, 10);
 
     await prisma.user.update({
       where: { id: existingUser.id },

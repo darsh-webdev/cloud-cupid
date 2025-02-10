@@ -5,6 +5,8 @@ import {
 } from "../actions/likeActions";
 import ListsTab from "./ListsTab";
 
+export const dynamic = "force-dynamic";
+
 const ListsPage = async ({
   searchParams: { type },
 }: {

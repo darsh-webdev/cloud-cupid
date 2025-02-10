@@ -33,8 +33,12 @@ const MemberPhotos = ({ photos, editing, mainImageUrl, members }: Props) => {
     try {
       await setMainImage(photo);
       router.refresh();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Error setting photo as profile image"
+      );
     } finally {
       setLoading({
         isLoading: false,
